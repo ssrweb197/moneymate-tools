@@ -1,0 +1,25 @@
+const items=[["EMI Calculator","emi"],["Loan Calculator","loan"],["FD Calculator","fd"],["PPF Calculator","ppf"],["SIP Calculator","sip"],["GST Calculator","gst"],["Salary Calculator","salary"],["Savings Goal","savings"],["Profit Margin","profit"],["Expense Calculator","expense"]];
+document.getElementById("cards").innerHTML=items.map(x=>`<article class="card"><h3>🧮 ${x[0]}</h3><p>Simple estimate for ${x[0].toLowerCase()}.</p><button onclick="openCalc('${x[1]}')">Calculate →</button></article>`).join("");
+const modal=document.getElementById("modal"),calc=document.getElementById("calc");
+function f(id,l,u=""){return `<div class="field"><label>${l}${u?" ("+u+")":""}</label><input id="${id}" type="number" min="0" step="any"></div>`}function n(id){return Number(document.getElementById(id)?.value)||0}function out(x){document.getElementById("out").innerHTML=`<div class="result">${x}</div>`}
+function openCalc(t){let h="";
+if(t==="emi"||t==="loan")h=`<h2>${t==="emi"?"EMI Calculator":"Loan Calculator"}</h2>${f("p","Loan amount","₹")}${f("r","Annual interest rate","%")}${f("n","Tenure","years")}<button class="calc-btn" onclick="emi()">Calculate</button><div id="out"></div>`;
+if(t==="fd")h=`<h2>FD Calculator</h2>${f("p","Deposit","₹")}${f("r","Annual interest","%")}${f("n","Tenure","years")}<button class="calc-btn" onclick="fd()">Calculate</button><div id="out"></div>`;
+if(t==="ppf")h=`<h2>PPF Calculator</h2>${f("p","Annual contribution","₹")}${f("r","Annual rate","%")}<div class="field"><label>Years</label><input id="n" type="number" value="15"></div><button class="calc-btn" onclick="ppf()">Calculate</button><div id="out"></div>`;
+if(t==="sip")h=`<h2>SIP Calculator</h2>${f("p","Monthly investment","₹")}${f("r","Expected annual return","%")}${f("n","Years")}<button class="calc-btn" onclick="sip()">Calculate</button><div id="out"></div>`;
+if(t==="gst")h=`<h2>GST Calculator</h2>${f("p","Amount","₹")}${f("r","GST rate","%")}<button class="calc-btn" onclick="gst()">Calculate</button><div id="out"></div>`;
+if(t==="salary")h=`<h2>Salary Calculator</h2>${f("p","Gross annual salary","₹")}${f("r","Annual deductions","₹")}<button class="calc-btn" onclick="salary()">Calculate</button><div id="out"></div>`;
+if(t==="savings")h=`<h2>Savings Goal</h2>${f("p","Target amount","₹")}${f("n","Months")}<button class="calc-btn" onclick="savings()">Calculate</button><div id="out"></div>`;
+if(t==="profit")h=`<h2>Profit Margin</h2>${f("p","Cost","₹")}${f("r","Selling price","₹")}<button class="calc-btn" onclick="profit()">Calculate</button><div id="out"></div>`;
+if(t==="expense")h=`<h2>Expense Calculator</h2>${f("p","Monthly income","₹")}${f("r","Monthly expenses","₹")}<button class="calc-btn" onclick="expense()">Calculate</button><div id="out"></div>`;
+calc.innerHTML=h;modal.classList.add("show")}
+function closeCalc(){modal.classList.remove("show")}
+function emi(){let p=n("p"),r=n("r")/1200,months=n("n")*12,m=p*r*Math.pow(1+r,months)/(Math.pow(1+r,months)-1);if(!r)m=p/months;out(`Monthly EMI: <b>₹${m.toLocaleString("en-IN",{maximumFractionDigits:0})}</b><br>Total payment: ₹${(m*months).toLocaleString("en-IN",{maximumFractionDigits:0})}<br>Total interest: ₹${(m*months-p).toLocaleString("en-IN",{maximumFractionDigits:0})}`)}
+function fd(){let p=n("p"),r=n("r")/100,y=n("n"),a=p*Math.pow(1+r/4,4*y);out(`Maturity value: <b>₹${a.toLocaleString("en-IN",{maximumFractionDigits:0})}</b><br>Estimated interest: ₹${(a-p).toLocaleString("en-IN",{maximumFractionDigits:0})}`)}
+function ppf(){let p=n("p"),r=n("r")/100,y=n("n"),a=0;for(let i=0;i<y;i++)a=(a+p)*(1+r);out(`Illustrative maturity value: <b>₹${a.toLocaleString("en-IN",{maximumFractionDigits:0})}</b>`)}
+function sip(){let p=n("p"),r=n("r")/1200,m=n("n")*12,a=p*((Math.pow(1+r,m)-1)/r)*(1+r);if(!r)a=p*m;out(`Estimated future value: <b>₹${a.toLocaleString("en-IN",{maximumFractionDigits:0})}</b><br>Invested: ₹${(p*m).toLocaleString("en-IN")}<br>Estimated gain: ₹${(a-p*m).toLocaleString("en-IN",{maximumFractionDigits:0})}`)}
+function gst(){let p=n("p"),g=p*n("r")/100;out(`GST: <b>₹${g.toFixed(2)}</b><br>Total with GST: <b>₹${(p+g).toFixed(2)}</b>`)}
+function salary(){let p=n("p"),d=n("r");out(`Approx. annual after deductions: <b>₹${Math.max(0,p-d).toLocaleString("en-IN")}</b><br>Monthly equivalent: ₹${(Math.max(0,p-d)/12).toLocaleString("en-IN",{maximumFractionDigits:0})}`)}
+function savings(){let p=n("p"),m=n("n");out(`Required average monthly saving: <b>₹${(p/m).toLocaleString("en-IN",{maximumFractionDigits:0})}</b>`)}
+function profit(){let c=n("p"),s=n("r"),pr=s-c,margin=s?pr/s*100:0;out(`Profit: <b>₹${pr.toLocaleString("en-IN")}</b><br>Profit margin: <b>${margin.toFixed(2)}%</b>`)}
+function expense(){let income=n("p"),e=n("r"),left=income-e;out(`Remaining: <b>₹${left.toLocaleString("en-IN")}</b><br>Expense ratio: <b>${income?(e/income*100).toFixed(2):0}%</b>`)}
